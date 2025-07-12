@@ -554,115 +554,246 @@ const AEOCompetitorRanking: React.FC<AEOCompetitorRankingProps> = ({
         </BentoGrid>
       </div>
 
-      {/* Detailed Competitor Ranking */}
+      {/* Enhanced Competitor Ranking */}
       <div>
         <h3 className="text-xl font-bold text-foreground mb-6">Ranking Detallado - {selectedLLM}</h3>
-        <BentoGrid className="grid-cols-1 min-h-[400px]">
+        
+        {/* Podium Top 3 */}
+        <div className="mb-8">
+          <div className="flex items-end justify-center gap-6 mb-8">
+            {/* Second Place */}
+            {currentLLMData.competitors[1] && (
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="flex flex-col items-center"
+              >
+                <div className="w-24 h-20 bg-gradient-to-t from-gray-400 to-gray-300 rounded-t-lg flex items-center justify-center relative mb-4">
+                  <div className="absolute -top-8 w-16 h-16 bg-card border-4 border-gray-400 rounded-full flex items-center justify-center shadow-lg">
+                    <img 
+                      src={getLLMLogoUrl('ChatGPT')} 
+                      alt="Logo"
+                      className="w-8 h-8 object-contain"
+                    />
+                  </div>
+                  <div className="absolute bottom-2 text-white font-bold text-lg">2</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-bold text-foreground text-sm">
+                    {currentLLMData.competitors[1].name === currentBrand ? 'Tu Marca' : currentLLMData.competitors[1].name}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{currentLLMData.competitors[1].mentions} menciones</div>
+                  <div className="text-xs font-medium text-gray-500">{currentLLMData.competitors[1].marketShare}% share</div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* First Place */}
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="flex flex-col items-center"
+            >
+              <div className="w-28 h-24 bg-gradient-to-t from-yellow-500 to-yellow-400 rounded-t-lg flex items-center justify-center relative mb-4">
+                <div className="absolute -top-10 w-20 h-20 bg-card border-4 border-yellow-500 rounded-full flex items-center justify-center shadow-xl">
+                  <Crown className="w-10 h-10 text-yellow-500" />
+                </div>
+                <div className="absolute bottom-2 text-white font-bold text-xl">1</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-foreground">
+                  {currentLLMData.competitors[0].name === currentBrand ? 'Tu Marca' : currentLLMData.competitors[0].name}
+                </div>
+                <div className="text-sm text-muted-foreground">{currentLLMData.competitors[0].mentions} menciones</div>
+                <div className="text-sm font-medium text-yellow-600">{currentLLMData.competitors[0].marketShare}% share</div>
+              </div>
+            </motion.div>
+
+            {/* Third Place */}
+            {currentLLMData.competitors[2] && (
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="flex flex-col items-center"
+              >
+                <div className="w-20 h-16 bg-gradient-to-t from-orange-600 to-orange-500 rounded-t-lg flex items-center justify-center relative mb-4">
+                  <div className="absolute -top-6 w-14 h-14 bg-card border-4 border-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                    <Medal className="w-7 h-7 text-orange-500" />
+                  </div>
+                  <div className="absolute bottom-2 text-white font-bold">3</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-bold text-foreground text-sm">
+                    {currentLLMData.competitors[2].name === currentBrand ? 'Tu Marca' : currentLLMData.competitors[2].name}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{currentLLMData.competitors[2].mentions} menciones</div>
+                  <div className="text-xs font-medium text-orange-600">{currentLLMData.competitors[2].marketShare}% share</div>
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </div>
+
+        {/* Detailed Ranking Table */}
+        <BentoGrid className="grid-cols-1 min-h-[450px]">
           <BentoGridItem
-            title="Top Competidores"
-            description={`Las marcas mejor posicionadas en ${selectedLLM} para "${query}"`}
-            icon={<Trophy className="w-6 h-6" />}
+            title="Tabla de Posiciones Completa"
+            description={`Análisis detallado de todas las marcas en ${selectedLLM}`}
+            icon={<BarChart3 className="w-6 h-6" />}
             size="large"
-            className="col-span-1 min-h-[380px]"
-            gradient="from-gradient-start to-gradient-end"
+            className="col-span-1 min-h-[430px]"
+            gradient="from-slate-600 to-slate-600/30"
           >
-            <div className="mt-6 space-y-3">
-              {currentLLMData.competitors.map((competitor, index) => {
-                const isCurrentBrand = competitor.name === currentBrand;
-                const isExpanded = expandedCompetitor === competitor.name;
-                
-                return (
-                  <motion.div
-                    key={competitor.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`p-4 rounded-xl border transition-all ${
-                      isCurrentBrand 
-                        ? 'border-primary bg-primary/5 ring-2 ring-primary/20' 
-                        : 'border-border/50 bg-muted/20 hover:bg-muted/40'
-                    }`}
-                  >
-                    <div 
-                      className="flex items-center justify-between cursor-pointer"
-                      onClick={() => setExpandedCompetitor(isExpanded ? null : competitor.name)}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                          {getPositionIcon(competitor.position)}
-                          <div className={`px-2 py-1 rounded text-xs font-bold border ${getPositionBadge(competitor.position)}`}>
-                            #{competitor.position}
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <div className={`font-semibold ${isCurrentBrand ? 'text-primary' : 'text-foreground'}`}>
-                            {competitor.name}
-                            {isCurrentBrand && <span className="ml-2 text-xs text-primary">(Tu marca)</span>}
-                          </div>
-                          <div className="text-sm text-muted-foreground">{competitor.domain}</div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <div className="font-semibold text-foreground">{competitor.mentions} menciones</div>
-                          <div className="text-sm text-muted-foreground">{competitor.marketShare}% share</div>
-                        </div>
-                        
-                        <div className="flex items-center gap-1">
-                          {getTrendIcon(competitor.trend)}
-                          <span className={`text-sm font-medium ${
-                            competitor.growth > 0 ? 'text-green-500' : 
-                            competitor.growth < 0 ? 'text-red-500' : 'text-yellow-500'
-                          }`}>
-                            {competitor.growth > 0 ? '+' : ''}{competitor.growth}%
-                          </span>
-                        </div>
-                        
-                        {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                      </div>
-                    </div>
+            <div className="mt-6">
+              <div className="overflow-hidden rounded-xl border border-border/50">
+                <div className="bg-muted/30 px-6 py-3 border-b border-border/50">
+                  <div className="grid grid-cols-12 gap-4 text-sm font-semibold text-muted-foreground">
+                    <div className="col-span-1">#</div>
+                    <div className="col-span-4">Marca</div>
+                    <div className="col-span-2 text-center">Menciones</div>
+                    <div className="col-span-2 text-center">Market Share</div>
+                    <div className="col-span-2 text-center">Tendencia</div>
+                    <div className="col-span-1 text-center">Detalles</div>
+                  </div>
+                </div>
+
+                <div className="divide-y divide-border/50">
+                  {currentLLMData.competitors.map((competitor, index) => {
+                    const isCurrentBrand = competitor.name === currentBrand;
+                    const isExpanded = expandedCompetitor === competitor.name;
                     
-                    <AnimatePresence>
-                      {isExpanded && (
+                    return (
+                      <div key={competitor.name} className="relative">
                         <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="mt-4 pt-4 border-t border-border/50"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className={`px-6 py-4 transition-all hover:bg-muted/20 ${
+                            isCurrentBrand ? 'bg-primary/5 border-l-4 border-l-primary' : ''
+                          }`}
                         >
-                          <div className="grid grid-cols-4 gap-4 text-sm">
-                            <div className="text-center">
-                              <div className="font-semibold text-foreground">{competitor.accuracy}%</div>
-                              <div className="text-xs text-muted-foreground">Precisión</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="font-semibold text-foreground">{competitor.category}</div>
-                              <div className="text-xs text-muted-foreground">Categoría</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="font-semibold text-foreground">{competitor.marketShare}%</div>
-                              <div className="text-xs text-muted-foreground">Participación</div>
-                            </div>
-                            <div className="text-center">
-                              <div className={`font-semibold ${
-                                competitor.trend === 'up' ? 'text-green-500' : 
-                                competitor.trend === 'down' ? 'text-red-500' : 'text-yellow-500'
-                              }`}>
-                                {competitor.trend === 'up' ? 'Creciendo' : 
-                                 competitor.trend === 'down' ? 'Bajando' : 'Estable'}
+                          <div className="grid grid-cols-12 gap-4 items-center">
+                            {/* Position */}
+                            <div className="col-span-1">
+                              <div className="flex items-center gap-2">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${getPositionBadge(competitor.position)}`}>
+                                  {competitor.position}
+                                </div>
                               </div>
-                              <div className="text-xs text-muted-foreground">Estado</div>
+                            </div>
+
+                            {/* Brand Info */}
+                            <div className="col-span-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full flex items-center justify-center">
+                                  <Building className="w-5 h-5 text-primary" />
+                                </div>
+                                <div>
+                                  <div className={`font-semibold ${isCurrentBrand ? 'text-primary' : 'text-foreground'}`}>
+                                    {competitor.name}
+                                    {isCurrentBrand && (
+                                      <span className="ml-2 px-2 py-0.5 bg-primary/20 text-primary text-xs rounded-full">
+                                        Tu marca
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">{competitor.domain}</div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Mentions */}
+                            <div className="col-span-2 text-center">
+                              <div className="text-lg font-bold text-foreground">{competitor.mentions}</div>
+                              <div className="text-xs text-muted-foreground">menciones</div>
+                            </div>
+
+                            {/* Market Share */}
+                            <div className="col-span-2 text-center">
+                              <div className="text-lg font-bold text-foreground">{competitor.marketShare}%</div>
+                              <div className="w-full bg-muted/30 rounded-full h-1.5 mt-1">
+                                <div 
+                                  className="bg-primary h-1.5 rounded-full transition-all duration-500"
+                                  style={{ width: `${competitor.marketShare}%` }}
+                                />
+                              </div>
+                            </div>
+
+                            {/* Trend */}
+                            <div className="col-span-2 text-center">
+                              <div className="flex items-center justify-center gap-1">
+                                {getTrendIcon(competitor.trend)}
+                                <span className={`text-sm font-semibold ${
+                                  competitor.growth > 0 ? 'text-green-500' : 
+                                  competitor.growth < 0 ? 'text-red-500' : 'text-yellow-500'
+                                }`}>
+                                  {competitor.growth > 0 ? '+' : ''}{competitor.growth}%
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Expand Button */}
+                            <div className="col-span-1 text-center">
+                              <button
+                                onClick={() => setExpandedCompetitor(isExpanded ? null : competitor.name)}
+                                className="p-1 hover:bg-muted/50 rounded transition-colors"
+                              >
+                                {isExpanded ? 
+                                  <ChevronUp className="w-4 h-4 text-muted-foreground" /> : 
+                                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                                }
+                              </button>
                             </div>
                           </div>
                         </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                );
-              })}
+
+                        {/* Expanded Details */}
+                        <AnimatePresence>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.3 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="px-6 py-4 bg-muted/10 border-t border-border/50">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                  <div className="text-center p-3 bg-card/50 rounded-lg">
+                                    <div className="text-2xl font-bold text-foreground">{competitor.accuracy}%</div>
+                                    <div className="text-sm text-muted-foreground">Precisión</div>
+                                  </div>
+                                  <div className="text-center p-3 bg-card/50 rounded-lg">
+                                    <div className="text-lg font-semibold text-foreground">{competitor.category}</div>
+                                    <div className="text-sm text-muted-foreground">Categoría</div>
+                                  </div>
+                                  <div className="text-center p-3 bg-card/50 rounded-lg">
+                                    <div className="text-2xl font-bold text-foreground">{competitor.marketShare}%</div>
+                                    <div className="text-sm text-muted-foreground">Participación</div>
+                                  </div>
+                                  <div className="text-center p-3 bg-card/50 rounded-lg">
+                                    <div className={`text-lg font-semibold ${
+                                      competitor.trend === 'up' ? 'text-green-500' : 
+                                      competitor.trend === 'down' ? 'text-red-500' : 'text-yellow-500'
+                                    }`}>
+                                      {competitor.trend === 'up' ? 'Creciendo' : 
+                                       competitor.trend === 'down' ? 'Bajando' : 'Estable'}
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">Estado</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </BentoGridItem>
         </BentoGrid>
