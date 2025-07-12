@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Sparkles, Search, Zap, Target, BarChart3, Globe, Camera } from 'lucide-react';
 import { GetStartedButton } from '@/components/ui/get-started-button';
 interface AEOBrandQueryFormProps {
@@ -17,9 +17,34 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
   const [screenshot, setScreenshot] = useState<string | null>(null);
   const [isScreenshotModalOpen, setIsScreenshotModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (brand.trim() && query.trim() && website.trim()) {
+  const [shortcutPressed, setShortcutPressed] = useState(false);
+  const [showShortcutTooltip, setShowShortcutTooltip] = useState(false);
+
+  // Global keyboard listener for ⌘ + Enter shortcut
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        
+        // Visual feedback
+        setShortcutPressed(true);
+        setTimeout(() => setShortcutPressed(false), 200);
+        
+        // Check if form is ready
+        if (brand.trim() && query.trim() && website.trim() && !isLoading) {
+          performSubmit();
+        } else {
+          setShowShortcutTooltip(true);
+          setTimeout(() => setShowShortcutTooltip(false), 2000);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [brand, query, website, isLoading]);
+  const performSubmit = async () => {
+    if (brand.trim() && query.trim() && website.trim() && !isLoading) {
       setIsLoading(true);
       // Simulate loading delay with enhanced analysis if screenshot provided
       const analysisTime = screenshot ? 1500 : 1000;
@@ -29,6 +54,11 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
         setIsLoading(false);
       }, analysisTime);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await performSubmit();
   };
 
   const handleWebsiteSubmit = (websiteUrl: string) => {
@@ -65,8 +95,31 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
     }
   };
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Only log Enter and modifier keys to reduce noise
+    if (e.key === 'Enter' || e.metaKey || e.ctrlKey) {
+      console.log('🎯 Key pressed:', e.key, 'metaKey:', e.metaKey, 'ctrlKey:', e.ctrlKey);
+    }
+    
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-      handleSubmit(e);
+      console.log('🚀 Shortcut detected!');
+      e.preventDefault();
+      
+      // Visual feedback for shortcut activation
+      setShortcutPressed(true);
+      setTimeout(() => setShortcutPressed(false), 200);
+      
+      console.log('📋 Form state:', { brand: brand.trim(), query: query.trim(), website: website.trim(), isLoading });
+      
+      // Check if form is ready to submit
+      if (brand.trim() && query.trim() && website.trim() && !isLoading) {
+        console.log('✅ Calling performSubmit');
+        performSubmit();
+      } else {
+        console.log('⚠️ Form not ready, showing tooltip');
+        // Show tooltip if form is not ready
+        setShowShortcutTooltip(true);
+        setTimeout(() => setShowShortcutTooltip(false), 2000);
+      }
     }
   };
   const exampleQueries = ["¿Cuáles son las mejores empresas de autos eléctricos?", "¿Qué marcas de tecnología son más innovadoras?", "¿Cuáles son las mejores opciones de streaming?", "¿Qué empresas lideran en inteligencia artificial?"];
@@ -157,13 +210,13 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
         delay: 0.4,
         duration: 0.6
       }} className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-8 shadow-xl">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="space-y-6">
             {/* Brand Input */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
                 Nombre de la Marca
               </label>
-              <input type="text" value={brand} onChange={e => setBrand(e.target.value)} placeholder="Ej. Tesla, Apple, OpenAI..." className="w-full px-6 py-4 bg-muted/50 border border-border/50 rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" onKeyDown={handleKeyDown} disabled={isLoading} />
+              <input type="text" value={brand} onChange={e => setBrand(e.target.value)} placeholder="Ej. Tesla, Apple, OpenAI..." className="w-full px-6 py-4 bg-muted/50 border border-border/50 rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" disabled={isLoading} />
             </div>
 
 
@@ -173,7 +226,7 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
                 Consulta de Búsqueda
               </label>
               <div className="relative">
-                <textarea value={query} onChange={e => setQuery(e.target.value)} placeholder="Escribe tu consulta aquí..." rows={4} className="w-full px-6 py-4 bg-muted/50 border-2 border-primary/20 rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none" onKeyDown={handleKeyDown} disabled={isLoading} />
+                <textarea value={query} onChange={e => setQuery(e.target.value)} placeholder="Escribe tu consulta aquí..." rows={4} className="w-full px-6 py-4 bg-muted/50 border-2 border-primary/20 rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none" disabled={isLoading} />
                 
                 {/* Submit Buttons */}
                 <div className="absolute bottom-4 right-4 flex items-center gap-2">
@@ -200,7 +253,9 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
                   <button 
                     type="submit" 
                     disabled={!brand.trim() || !query.trim() || !website.trim() || isLoading} 
-                    className="w-12 h-12 bg-primary hover:bg-primary/90 disabled:bg-muted disabled:cursor-not-allowed rounded-xl flex items-center justify-center transition-all group shadow-lg hover:shadow-primary/25"
+                    className={`w-12 h-12 bg-primary hover:bg-primary/90 disabled:bg-muted disabled:cursor-not-allowed rounded-xl flex items-center justify-center transition-all group shadow-lg hover:shadow-primary/25 ${
+                      shortcutPressed ? 'scale-95 bg-primary/80' : ''
+                    }`}
                   >
                     {isLoading ? (
                       <div className="flex items-center gap-2">
@@ -233,14 +288,77 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
               </div>
             </div>
 
-            {/* Instructions */}
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground pt-4 border-t border-border/50">
+            {/* Enhanced Instructions */}
+            <motion.div 
+              className={`flex items-center justify-center gap-2 text-sm pt-4 border-t border-border/50 transition-all duration-200 ${
+                shortcutPressed ? 'text-primary scale-105' : 'text-muted-foreground'
+              }`}
+              animate={{ 
+                scale: shortcutPressed ? 1.05 : 1,
+                opacity: shortcutPressed ? 1 : 0.8 
+              }}
+            >
               <span>Presiona</span>
-              <kbd className="px-2 py-1 bg-muted/50 rounded text-xs font-mono border border-border/50">⌘</kbd>
+              <kbd className={`px-3 py-1.5 rounded-lg text-xs font-mono border transition-all duration-200 ${
+                shortcutPressed 
+                  ? 'bg-primary/20 border-primary/40 text-primary shadow-md' 
+                  : 'bg-muted/50 border-border/50'
+              }`}>
+                ⌘
+              </kbd>
               <span>+</span>
-              <kbd className="px-2 py-1 bg-muted/50 rounded text-xs font-mono border border-border/50">Enter</kbd>
+              <kbd className={`px-3 py-1.5 rounded-lg text-xs font-mono border transition-all duration-200 ${
+                shortcutPressed 
+                  ? 'bg-primary/20 border-primary/40 text-primary shadow-md' 
+                  : 'bg-muted/50 border-border/50'
+              }`}>
+                Enter
+              </kbd>
               <span>para enviar</span>
-            </div>
+              {shortcutPressed && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="text-primary font-medium"
+                >
+                  ⚡
+                </motion.span>
+              )}
+              
+              {/* Smart hint when partially filled */}
+              {(brand.trim() || query.trim() || website.trim()) && 
+               !(brand.trim() && query.trim() && website.trim()) && (
+                <motion.span
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="text-xs text-orange-500 ml-2 font-medium"
+                >
+                  {!brand.trim() ? '• Falta marca' : 
+                   !query.trim() ? '• Falta consulta' : 
+                   !website.trim() ? '• Falta website' : ''}
+                </motion.span>
+              )}
+            </motion.div>
+
+            {/* Shortcut Feedback Tooltip */}
+            <AnimatePresence>
+              {showShortcutTooltip && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                  className="absolute top-4 right-4 bg-orange-500/10 border border-orange-500/20 rounded-xl p-3 backdrop-blur-sm"
+                >
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-orange-500">⚠️</span>
+                    <span className="text-orange-600 font-medium">
+                      Completa todos los campos para usar el shortcut
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </form>
         </motion.div>
 
