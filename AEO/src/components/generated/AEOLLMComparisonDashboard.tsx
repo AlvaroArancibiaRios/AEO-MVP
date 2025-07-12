@@ -7,6 +7,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 interface QueryData {
   brand: string;
   query: string;
+  website: string;
 }
 interface LLMModel {
   id: string;
@@ -254,6 +255,7 @@ const AEOLLMComparisonDashboard: React.FC<AEOLLMComparisonDashboardProps> = ({
               <h1 className="text-2xl font-bold text-foreground">Comparación Detallada de LLMs</h1>
               <p className="text-muted-foreground">
                 Análisis profundo para "{queryData.query}" - {queryData.brand}
+                {queryData.website && <span className="ml-2">({queryData.website})</span>}
               </p>
             </div>
           </div>

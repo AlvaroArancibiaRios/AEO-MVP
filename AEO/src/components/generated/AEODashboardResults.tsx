@@ -8,6 +8,7 @@ import AEORecommendationsList from './AEORecommendationsList';
 interface QueryData {
   brand: string;
   query: string;
+  website: string;
 }
 interface AEODashboardResultsProps {
   queryData: QueryData;
@@ -80,6 +81,7 @@ const AEODashboardResults: React.FC<AEODashboardResultsProps> = ({
               <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50" />
               <span className="text-sm font-medium text-muted-foreground">
                 Analizando: <span className="text-foreground font-semibold">{queryData.brand}</span>
+                {queryData.website && <span className="text-muted-foreground ml-2">({queryData.website})</span>}
               </span>
             </div>
             <div className="flex items-center gap-3 px-4 py-2 bg-muted/50 rounded-xl border border-border/50">

@@ -2,25 +2,47 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Search, Zap, Target, BarChart3 } from 'lucide-react';
+import { ArrowRight, Sparkles, Search, Zap, Target, BarChart3, Globe } from 'lucide-react';
+import { GetStartedButton } from '@/components/ui/get-started-button';
 interface AEOBrandQueryFormProps {
-  onSearch: (brand: string, query: string) => void;
+  onSearch: (brand: string, query: string, website: string) => void;
 }
 const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
   onSearch
 }) => {
   const [brand, setBrand] = useState('');
   const [query, setQuery] = useState('');
+  const [website, setWebsite] = useState('');
+  const [isWebsiteModalOpen, setIsWebsiteModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (brand.trim() && query.trim()) {
+    if (brand.trim() && query.trim() && website.trim()) {
       setIsLoading(true);
       // Simulate loading delay
       setTimeout(() => {
-        onSearch(brand.trim(), query.trim());
+        onSearch(brand.trim(), query.trim(), website.trim());
         setIsLoading(false);
       }, 1000);
+    }
+  };
+
+  const handleWebsiteSubmit = (websiteUrl: string) => {
+    setWebsite(websiteUrl);
+    setIsWebsiteModalOpen(false);
+  };
+
+  const openWebsiteModal = () => {
+    setIsWebsiteModalOpen(true);
+  };
+
+  const scrollToForm = () => {
+    const formElement = document.getElementById('brand-form');
+    if (formElement) {
+      formElement.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
     }
   };
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -41,8 +63,8 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
     icon: <Target className="w-5 h-5" />,
     title: "Recomendaciones",
     description: "Estrategias personalizadas AEO"
-  }] as any[];
-  return <div className="flex items-center justify-center min-h-[calc(100vh-120px)] px-6">
+  }];
+  return <div className="flex items-center justify-center min-h-[calc(100vh-120px)] px-6 py-12">
       <div className="w-full max-w-4xl">
         {/* Hero Section */}
         <motion.div initial={{
@@ -53,7 +75,7 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
         y: 0
       }} transition={{
         duration: 0.6
-      }} className="text-center mb-12">
+      }} className="text-center mb-16 px-8 py-12">
           <div className="flex items-center justify-center gap-3 mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/70 rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25">
               <Sparkles className="w-6 h-6 text-primary-foreground" />
@@ -67,15 +89,14 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
 
           {/* Features Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            {features.map((feature, index) => <motion.div key={index} initial={{
-            opacity: 0,
-            y: 20
-          }} animate={{
-            opacity: 1,
-            y: 0
-          }} transition={{
-            delay: 0.2 + index * 0.1
-          }} className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-6 hover:shadow-lg transition-all duration-300">
+            {features.map((feature, index) => (
+              <motion.div 
+                key={index} 
+                initial={{ opacity: 0, y: 20 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                transition={{ delay: 0.2 + index * 0.1 }} 
+                className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-6 hover:shadow-lg transition-all duration-300"
+              >
                 <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center mb-4 mx-auto">
                   <div className="text-primary">
                     {feature.icon}
@@ -83,12 +104,31 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
                 </div>
                 <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
                 <p className="text-sm text-muted-foreground">{feature.description}</p>
-              </motion.div>)}
+              </motion.div>
+            ))}
           </div>
+
+          {/* Call to Action */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+            className="text-center mb-8"
+          >
+            <GetStartedButton
+              onClick={scrollToForm}
+              size="lg"
+              className="shadow-lg hover:shadow-xl hover:shadow-primary/25 transition-shadow duration-300"
+            >
+              Analiza tu marca ahora
+            </GetStartedButton>
+          </motion.div>
         </motion.div>
 
         {/* Form Section */}
-        <motion.div initial={{
+        <motion.div 
+          id="brand-form"
+          initial={{
         opacity: 0,
         y: 20
       }} animate={{
@@ -107,6 +147,7 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
               <input type="text" value={brand} onChange={e => setBrand(e.target.value)} placeholder="Ej. Tesla, Apple, OpenAI..." className="w-full px-6 py-4 bg-muted/50 border border-border/50 rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" onKeyDown={handleKeyDown} disabled={isLoading} />
             </div>
 
+
             {/* Query Input */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
@@ -115,10 +156,24 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
               <div className="relative">
                 <textarea value={query} onChange={e => setQuery(e.target.value)} placeholder="Escribe tu consulta aquí..." rows={4} className="w-full px-6 py-4 bg-muted/50 border-2 border-primary/20 rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none" onKeyDown={handleKeyDown} disabled={isLoading} />
                 
-                {/* Submit Button */}
-                <button type="submit" disabled={!brand.trim() || !query.trim() || isLoading} className="absolute bottom-4 right-4 w-12 h-12 bg-primary hover:bg-primary/90 disabled:bg-muted disabled:cursor-not-allowed rounded-xl flex items-center justify-center transition-all group shadow-lg hover:shadow-primary/25">
-                  {isLoading ? <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> : <ArrowRight className="w-5 h-5 text-primary-foreground group-hover:translate-x-0.5 transition-transform" />}
-                </button>
+                {/* Submit Button with Cloud */}
+                <div className="absolute bottom-4 right-4 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={openWebsiteModal}
+                    disabled={isLoading}
+                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:bg-muted/50 disabled:cursor-not-allowed border border-border/30"
+                  >
+                    <Globe className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
+                  </button>
+                  <button 
+                    type="submit" 
+                    disabled={!brand.trim() || !query.trim() || !website.trim() || isLoading} 
+                    className="w-12 h-12 bg-primary hover:bg-primary/90 disabled:bg-muted disabled:cursor-not-allowed rounded-xl flex items-center justify-center transition-all group shadow-lg hover:shadow-primary/25"
+                  >
+                    {isLoading ? <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> : <ArrowRight className="w-5 h-5 text-primary-foreground group-hover:translate-x-0.5 transition-transform" />}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -142,6 +197,60 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
             </div>
           </form>
         </motion.div>
+
+        {/* Website Modal */}
+        {isWebsiteModalOpen && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-background border border-border/50 rounded-2xl p-6 w-full max-w-md shadow-xl"
+            >
+              <h3 className="text-lg font-semibold text-foreground mb-4">
+                Agregar Sitio Web
+              </h3>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target as HTMLFormElement);
+                const websiteUrl = formData.get('website') as string;
+                if (websiteUrl.trim()) {
+                  handleWebsiteSubmit(websiteUrl.trim());
+                }
+              }}>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-foreground block mb-2">
+                      URL del Sitio Web
+                    </label>
+                    <input
+                      type="text"
+                      name="website"
+                      placeholder="Ej. www.tesla.com, apple.com..."
+                      className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                      defaultValue={website}
+                      autoFocus
+                    />
+                  </div>
+                  <div className="flex gap-3 justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setIsWebsiteModalOpen(false)}
+                      className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+                    >
+                      Guardar
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
 
         {/* Stats Footer */}
         <motion.div initial={{

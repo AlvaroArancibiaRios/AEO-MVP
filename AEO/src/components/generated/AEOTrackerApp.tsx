@@ -9,6 +9,7 @@ import AEOLLMComparisonDashboard from './AEOLLMComparisonDashboard';
 interface QueryData {
   brand: string;
   query: string;
+  website: string;
 }
 type ViewType = 'search' | 'results' | 'comparison' | 'ocr' | 'seo' | 'competitors' | 'documents';
 const AEOTrackerApp: React.FC = () => {
@@ -52,10 +53,11 @@ const AEOTrackerApp: React.FC = () => {
     icon: Bot,
     isNew: false
   }] as any[];
-  const handleSearch = (brand: string, query: string) => {
+  const handleSearch = (brand: string, query: string, website: string) => {
     setQueryData({
       brand,
-      query
+      query,
+      website
     });
     setCurrentView('results');
   };
