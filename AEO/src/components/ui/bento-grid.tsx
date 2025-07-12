@@ -14,6 +14,7 @@ interface BentoGridItemProps {
   children?: React.ReactNode;
   actionText?: string;
   gradient?: string;
+  logoUrl?: string; // New prop for LLM logos
 }
 
 const BentoGridItem = ({
@@ -26,10 +27,18 @@ const BentoGridItem = ({
   children,
   actionText = 'Ver más',
   gradient = 'from-primary to-primary/30',
+  logoUrl,
 }: BentoGridItemProps) => {
   const variants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { type: 'spring', damping: 25 } },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      transition: { 
+        type: 'spring' as const, 
+        damping: 25 
+      } 
+    },
   };
 
   return (
@@ -53,7 +62,15 @@ const BentoGridItem = ({
       <div className="relative z-10 flex h-full flex-col justify-between">
         <div>
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary shadow-sm transition-all duration-500 group-hover:bg-primary/20 group-hover:shadow-lg group-hover:shadow-primary/20">
-            {icon}
+            {logoUrl ? (
+              <img 
+                src={logoUrl} 
+                alt={`${title} logo`}
+                className="w-8 h-8 object-contain"
+              />
+            ) : (
+              icon
+            )}
           </div>
           <h3 className="mb-2 text-lg font-semibold tracking-tight text-foreground">{title}</h3>
           <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>

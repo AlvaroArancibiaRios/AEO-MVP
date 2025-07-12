@@ -2,6 +2,13 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+
+// Import logos directly for URL access
+import OpenAILogo from '../ui/Logos Llm/openai.svg?url';
+import ClaudeLogo from '../ui/Logos Llm/claude-color.svg?url';
+import GeminiLogo from '../ui/Logos Llm/gemini-color.svg?url';
+import PerplexityLogo from '../ui/Logos Llm/perplexity-color.svg?url';
+import DeepSeekLogo from '../ui/Logos Llm/deepseek-color.svg?url';
 import { 
   MessageSquare, 
   Brain, 
@@ -45,6 +52,20 @@ const AEOLLMComparisonGrid: React.FC<AEOLLMComparisonGridProps> = ({
   onSelectLLM,
   selectedLLM
 }) => {
+  // Helper function to get logo URL for LLM
+  const getLLMLogoUrl = (name: string): string | undefined => {
+    const logoMap: Record<string, string> = {
+      'ChatGPT': OpenAILogo,
+      'OpenAI': OpenAILogo,
+      'Claude': ClaudeLogo,
+      'Gemini': GeminiLogo,
+      'Perplexity': PerplexityLogo,
+      'DeepSpeak': DeepSeekLogo,
+      'DeepSeek': DeepSeekLogo,
+      'You.com': GeminiLogo, // Fallback
+    };
+    return logoMap[name];
+  };
   const getTrendIcon = (trend: string) => {
     switch (trend) {
       case 'up': return <TrendingUp className="w-4 h-4 text-green-500" />;
@@ -95,7 +116,7 @@ const AEOLLMComparisonGrid: React.FC<AEOLLMComparisonGridProps> = ({
       {/* Top Performers */}
       <div>
         <h3 className="text-xl font-bold text-foreground mb-6">Ranking de Rendimiento</h3>
-        <BentoGrid className="grid-cols-1 md:grid-cols-5">
+        <BentoGrid className="grid-cols-1 md:grid-cols-5 min-h-[280px]">
           {llmResults.map((llm, index) => {
             const performance = getPerformanceLevel(llm.accuracy, llm.mentions);
             const isSelected = selectedLLM === llm.name;
@@ -106,6 +127,7 @@ const AEOLLMComparisonGrid: React.FC<AEOLLMComparisonGridProps> = ({
                 title={llm.name}
                 description={`${llm.mentions} menciones • ${llm.accuracy}% precisión`}
                 icon={React.createElement(llm.icon, { className: "w-6 h-6" })}
+                logoUrl={getLLMLogoUrl(llm.name)}
                 size="small"
                 className={`col-span-1 ${isSelected ? 'ring-2 ring-primary border-primary/50' : ''}`}
                 gradient="from-primary to-primary/30"
@@ -153,14 +175,14 @@ const AEOLLMComparisonGrid: React.FC<AEOLLMComparisonGridProps> = ({
       {/* Detailed Comparison */}
       <div>
         <h3 className="text-xl font-bold text-foreground mb-6">Análisis Comparativo Detallado</h3>
-        <BentoGrid className="grid-cols-1 md:grid-cols-6">
+        <BentoGrid className="grid-cols-1 md:grid-cols-6 min-h-[220px]">
           {/* Best Accuracy */}
           <BentoGridItem
             title="Mayor Precisión"
             description={`${llmResults.reduce((best, current) => current.accuracy > best.accuracy ? current : best).name} lidera con ${Math.max(...llmResults.map(l => l.accuracy))}%`}
             icon={<Target className="w-6 h-6" />}
             size="medium"
-            className="col-span-2"
+            className="col-span-2 min-h-[200px]"
             gradient="from-green-500 to-green-500/30"
           >
             <div className="mt-4">

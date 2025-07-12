@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { LLMLogo } from '../ui/llm-logos';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -17,6 +18,13 @@ import {
   ArrowUp,
   ArrowDown
 } from 'lucide-react';
+
+// Import logos directly for URL access
+import OpenAILogo from '../ui/Logos Llm/openai.svg?url';
+import ClaudeLogo from '../ui/Logos Llm/claude-color.svg?url';
+import GeminiLogo from '../ui/Logos Llm/gemini-color.svg?url';
+import PerplexityLogo from '../ui/Logos Llm/perplexity-color.svg?url';
+import DeepSeekLogo from '../ui/Logos Llm/deepseek-color.svg?url';
 import { BentoGrid, BentoGridItem } from '../ui/bento-grid';
 import { cn } from '@/lib/utils';
 
@@ -62,6 +70,20 @@ const AEOMetricsGrid: React.FC<AEOMetricsGridProps> = ({
   onViewTemporal,
   onViewDetailedAnalysis
 }) => {
+  // Helper function to get logo URL for LLM
+  const getLLMLogoUrl = (name: string): string | undefined => {
+    const logoMap: Record<string, string> = {
+      'ChatGPT': OpenAILogo,
+      'OpenAI': OpenAILogo,
+      'Claude': ClaudeLogo,
+      'Gemini': GeminiLogo,
+      'Perplexity': PerplexityLogo,
+      'DeepSpeak': DeepSeekLogo,
+      'DeepSeek': DeepSeekLogo,
+      'You.com': GeminiLogo, // Fallback
+    };
+    return logoMap[name];
+  };
   const getTrendIcon = (trend: string) => {
     switch (trend) {
       case 'up': return <TrendingUp className="w-4 h-4 text-green-500" />;
@@ -267,6 +289,7 @@ const AEOMetricsGrid: React.FC<AEOMetricsGridProps> = ({
             title={llm.name}
             description={`Posición #${llm.position} • ${llm.mentions} menciones`}
             icon={React.createElement(llm.icon, { className: "w-6 h-6" })}
+            logoUrl={getLLMLogoUrl(llm.name)}
             size="medium"
             className="col-span-1"
             gradient="from-primary to-primary/30"

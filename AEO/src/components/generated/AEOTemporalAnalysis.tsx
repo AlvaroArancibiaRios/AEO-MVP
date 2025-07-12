@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { temporalDB, generateMockHistoricalData, type PositionRecord, type VariabilityTest } from '../../lib/temporalDB';
+import { temporalDB, generateMockHistoricalData, type PositionRecord as DBPositionRecord, type VariabilityTest as DBVariabilityTest } from '../../lib/temporalDB';
 import { 
   ArrowLeft,
   Calendar,
@@ -41,22 +41,14 @@ interface AEOTemporalAnalysisProps {
   onBack: () => void;
 }
 
-interface PositionRecord {
-  timestamp: string;
-  date: string;
-  llm: string;
-  position: number;
-  mentions: number;
-  accuracy: number;
-  context_quality: string;
-}
+// Using imported PositionRecord from temporalDB
 
 interface TrendAnalysis {
   overall_trend: 'up' | 'down' | 'stable';
   biggest_mover: {
     llm: string;
     change: number;
-    direction: 'up' | 'down';
+    direction: 'up' | 'down' | 'stable';
   };
   most_stable: string;
   volatility_score: number;
@@ -67,28 +59,16 @@ interface TrendAnalysis {
   }[];
 }
 
-interface VariabilityTest {
-  query_id: string;
-  timestamp: string;
-  results: {
-    llm: string;
-    position_1: number;
-    position_2: number;
-    position_3: number;
-    consistency_score: number;
-    variation_range: number;
-  }[];
-  overall_consistency: number;
-}
+// Using imported VariabilityTest from temporalDB
 
 const AEOTemporalAnalysis: React.FC<AEOTemporalAnalysisProps> = ({ queryData, onBack }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'timeline' | 'trends' | 'variability' | 'monitoring'>('timeline');
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
   const [isMonitoring, setIsMonitoring] = useState(false);
-  const [historicalData, setHistoricalData] = useState<PositionRecord[]>([]);
+  const [historicalData, setHistoricalData] = useState<DBPositionRecord[]>([]);
   const [trendAnalysis, setTrendAnalysis] = useState<TrendAnalysis | null>(null);
-  const [variabilityData, setVariabilityData] = useState<VariabilityTest[]>([]);
+  const [variabilityData, setVariabilityData] = useState<DBVariabilityTest[]>([]);
   const [expandedLLM, setExpandedLLM] = useState<string | null>(null);
 
   useEffect(() => {
@@ -127,7 +107,7 @@ const AEOTemporalAnalysis: React.FC<AEOTemporalAnalysisProps> = ({ queryData, on
     }, 1500);
   };
 
-  const generateTrendAnalysis = (data: PositionRecord[]): TrendAnalysis => {
+  const generateTrendAnalysis = (data: DBPositionRecord[]): TrendAnalysis => {
     const trends = temporalDB.getPositionTrends(queryData.brand, queryData.query, 
       timeRange === '7d' ? 168 : timeRange === '30d' ? 720 : 2160);
     
