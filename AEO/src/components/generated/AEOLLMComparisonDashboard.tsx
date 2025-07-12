@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AEOLLMComparisonGrid from './AEOLLMComparisonGrid';
-import { ArrowLeft, Download, Filter, SortAsc, SortDesc, TrendingUp, TrendingDown, BarChart3, Activity, Target, Award, Zap, Eye, Calendar } from 'lucide-react';
+import { ArrowLeft, Download, Filter, SortAsc, SortDesc, TrendingUp, TrendingDown, BarChart3, Activity, Target, Award, Zap, Eye, Calendar, MessageSquare, Brain, Sparkles, Search, Globe } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 interface QueryData {
   brand: string;
@@ -52,7 +52,8 @@ const AEOLLMComparisonDashboard: React.FC<AEOLLMComparisonDashboardProps> = ({
     lastUpdated: '2024-01-15T10:30:00Z',
     totalQueries: 1250,
     successRate: 96.8,
-    avgPosition: 1.3
+    avgPosition: 1.3,
+    icon: MessageSquare
   }, {
     id: 'perplexity',
     name: 'Perplexity',
@@ -66,7 +67,8 @@ const AEOLLMComparisonDashboard: React.FC<AEOLLMComparisonDashboardProps> = ({
     lastUpdated: '2024-01-15T10:25:00Z',
     totalQueries: 980,
     successRate: 94.2,
-    avgPosition: 1.8
+    avgPosition: 1.8,
+    icon: Search
   }, {
     id: 'claude',
     name: 'Claude',
@@ -80,7 +82,8 @@ const AEOLLMComparisonDashboard: React.FC<AEOLLMComparisonDashboardProps> = ({
     lastUpdated: '2024-01-15T10:20:00Z',
     totalQueries: 750,
     successRate: 92.1,
-    avgPosition: 2.4
+    avgPosition: 2.4,
+    icon: Brain
   }, {
     id: 'gemini',
     name: 'Gemini',
@@ -94,7 +97,8 @@ const AEOLLMComparisonDashboard: React.FC<AEOLLMComparisonDashboardProps> = ({
     lastUpdated: '2024-01-15T10:15:00Z',
     totalQueries: 680,
     successRate: 89.7,
-    avgPosition: 2.9
+    avgPosition: 2.9,
+    icon: Sparkles
   }, {
     id: 'deepspeak',
     name: 'DeepSpeak',
@@ -108,7 +112,8 @@ const AEOLLMComparisonDashboard: React.FC<AEOLLMComparisonDashboardProps> = ({
     lastUpdated: '2024-01-15T10:10:00Z',
     totalQueries: 420,
     successRate: 86.3,
-    avgPosition: 3.7
+    avgPosition: 3.7,
+    icon: Globe
   }];
 
   // Historical trend data

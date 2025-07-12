@@ -266,10 +266,10 @@ const AEOMetricsGrid: React.FC<AEOMetricsGridProps> = ({
             key={llm.name}
             title={llm.name}
             description={`Posición #${llm.position} • ${llm.mentions} menciones`}
-            icon={<llm.icon className="w-6 h-6" />}
+            icon={React.createElement(llm.icon, { className: "w-6 h-6" })}
             size="medium"
             className="col-span-1"
-            gradient={`from-[${llm.color}] to-[${llm.color}]/30`}
+            gradient="from-primary to-primary/30"
             onClick={onViewDetailedAnalysis}
             actionText="Ver detalles"
           >

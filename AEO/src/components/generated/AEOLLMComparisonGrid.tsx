@@ -105,10 +105,10 @@ const AEOLLMComparisonGrid: React.FC<AEOLLMComparisonGridProps> = ({
                 key={llm.name}
                 title={llm.name}
                 description={`${llm.mentions} menciones • ${llm.accuracy}% precisión`}
-                icon={<llm.icon className="w-6 h-6" />}
+                icon={React.createElement(llm.icon, { className: "w-6 h-6" })}
                 size="small"
                 className={`col-span-1 ${isSelected ? 'ring-2 ring-primary border-primary/50' : ''}`}
-                gradient={`from-[${llm.color}] to-[${llm.color}]/30`}
+                gradient="from-primary to-primary/30"
                 onClick={() => onSelectLLM?.(llm.name)}
                 actionText="Ver detalles"
               >
@@ -237,7 +237,7 @@ const AEOLLMComparisonGrid: React.FC<AEOLLMComparisonGridProps> = ({
               icon={<llm.icon className="w-6 h-6" />}
               size="medium"
               className="col-span-1"
-              gradient={`from-[${llm.color}] to-[${llm.color}]/30`}
+              gradient="from-primary to-primary/30"
             >
               <div className="mt-4 space-y-3">
                 <div className="flex items-center justify-between">
