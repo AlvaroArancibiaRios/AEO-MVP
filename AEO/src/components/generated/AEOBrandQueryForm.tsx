@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Search, Zap, Target, BarChart3, Globe } from 'lucide-react';
+import { ArrowRight, Sparkles, Search, Zap, Target, BarChart3, Globe, Camera } from 'lucide-react';
 import { GetStartedButton } from '@/components/ui/get-started-button';
 interface AEOBrandQueryFormProps {
-  onSearch: (brand: string, query: string, website: string) => void;
+  onSearch: (brand: string, query: string, website: string, screenshot?: string) => void;
 }
 const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
   onSearch
@@ -14,16 +14,20 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
   const [query, setQuery] = useState('');
   const [website, setWebsite] = useState('');
   const [isWebsiteModalOpen, setIsWebsiteModalOpen] = useState(false);
+  const [screenshot, setScreenshot] = useState<string | null>(null);
+  const [isScreenshotModalOpen, setIsScreenshotModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (brand.trim() && query.trim() && website.trim()) {
       setIsLoading(true);
-      // Simulate loading delay
+      // Simulate loading delay with enhanced analysis if screenshot provided
+      const analysisTime = screenshot ? 1500 : 1000;
       setTimeout(() => {
-        onSearch(brand.trim(), query.trim(), website.trim());
+        // Pass screenshot data along with other params
+        onSearch(brand.trim(), query.trim(), website.trim(), screenshot || undefined);
         setIsLoading(false);
-      }, 1000);
+      }, analysisTime);
     }
   };
 
@@ -34,6 +38,21 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
 
   const openWebsiteModal = () => {
     setIsWebsiteModalOpen(true);
+  };
+
+  const openScreenshotModal = () => {
+    setIsScreenshotModalOpen(true);
+  };
+
+  const handleScreenshotUpload = (file: File) => {
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setScreenshot(e.target?.result as string);
+        setIsScreenshotModalOpen(false);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const scrollToForm = () => {
@@ -156,8 +175,20 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
               <div className="relative">
                 <textarea value={query} onChange={e => setQuery(e.target.value)} placeholder="Escribe tu consulta aquí..." rows={4} className="w-full px-6 py-4 bg-muted/50 border-2 border-primary/20 rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none" onKeyDown={handleKeyDown} disabled={isLoading} />
                 
-                {/* Submit Button with Cloud */}
+                {/* Submit Buttons */}
                 <div className="absolute bottom-4 right-4 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={openScreenshotModal}
+                    disabled={isLoading}
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:bg-muted/50 disabled:cursor-not-allowed border border-border/30 ${
+                      screenshot ? 'bg-green-500/10 border-green-500/30' : ''
+                    }`}
+                  >
+                    <Camera className={`w-5 h-5 transition-colors ${
+                      screenshot ? 'text-green-500' : 'text-muted-foreground hover:text-foreground'
+                    }`} />
+                  </button>
                   <button
                     type="button"
                     onClick={openWebsiteModal}
@@ -171,11 +202,26 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
                     disabled={!brand.trim() || !query.trim() || !website.trim() || isLoading} 
                     className="w-12 h-12 bg-primary hover:bg-primary/90 disabled:bg-muted disabled:cursor-not-allowed rounded-xl flex items-center justify-center transition-all group shadow-lg hover:shadow-primary/25"
                   >
-                    {isLoading ? <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> : <ArrowRight className="w-5 h-5 text-primary-foreground group-hover:translate-x-0.5 transition-transform" />}
+                    {isLoading ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                        {screenshot && <Camera className="w-3 h-3 text-primary-foreground/80" />}
+                      </div>
+                    ) : (
+                      <ArrowRight className="w-5 h-5 text-primary-foreground group-hover:translate-x-0.5 transition-transform" />
+                    )}
                   </button>
                 </div>
               </div>
             </div>
+
+            {/* Screenshot Indicator */}
+            {screenshot && (
+              <div className="flex items-center gap-2 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                <Camera className="w-4 h-4 text-green-500" />
+                <span className="text-sm text-green-600 font-medium">Screenshot subido - Análisis mejorado disponible</span>
+              </div>
+            )}
 
             {/* Example Queries */}
             <div className="space-y-3">
@@ -248,6 +294,63 @@ const AEOBrandQueryForm: React.FC<AEOBrandQueryFormProps> = ({
                   </div>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Screenshot Modal */}
+        {isScreenshotModalOpen && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-background border border-border/50 rounded-2xl p-6 w-full max-w-md shadow-xl"
+            >
+              <h3 className="text-lg font-semibold text-foreground mb-4">
+                Subir Screenshot para Análisis LLM
+              </h3>
+              <p className="text-sm text-muted-foreground mb-6">
+                Analiza cómo aparece tu marca en resultados de búsqueda para optimizar su presencia en LLMs
+              </p>
+              
+              <div 
+                className="border-2 border-dashed border-border rounded-xl p-8 hover:border-primary/50 transition-colors cursor-pointer mb-4"
+                onClick={() => {
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'image/*';
+                  input.onchange = (e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    if (file) handleScreenshotUpload(file);
+                  };
+                  input.click();
+                }}
+              >
+                <div className="text-center">
+                  <Camera className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-sm font-medium text-foreground mb-1">Subir Screenshot</p>
+                  <p className="text-xs text-muted-foreground">
+                    Captura de pantalla de resultados de búsqueda o LLM
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsScreenshotModalOpen(false)}
+                  className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsScreenshotModalOpen(false)}
+                  className="px-6 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-colors text-sm font-medium"
+                >
+                  Saltar por ahora
+                </button>
+              </div>
             </motion.div>
           </div>
         )}

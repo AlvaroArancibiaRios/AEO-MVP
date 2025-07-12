@@ -6,10 +6,12 @@ import { Menu, Sparkles, Settings, Bell, User, Search, Eye, FileText, BarChart3,
 import AEOBrandQueryForm from './AEOBrandQueryForm';
 import AEODashboardResults from './AEODashboardResults';
 import AEOLLMComparisonDashboard from './AEOLLMComparisonDashboard';
+import AEOOCRAnalysis from './AEOOCRAnalysis';
 interface QueryData {
   brand: string;
   query: string;
   website: string;
+  screenshot?: string;
 }
 type ViewType = 'search' | 'results' | 'comparison' | 'ocr' | 'seo' | 'competitors' | 'documents';
 const AEOTrackerApp: React.FC = () => {
@@ -53,11 +55,12 @@ const AEOTrackerApp: React.FC = () => {
     icon: Bot,
     isNew: false
   }] as any[];
-  const handleSearch = (brand: string, query: string, website: string) => {
+  const handleSearch = (brand: string, query: string, website: string, screenshot?: string) => {
     setQueryData({
       brand,
       query,
-      website
+      website,
+      screenshot
     });
     setCurrentView('results');
   };
@@ -72,6 +75,12 @@ const AEOTrackerApp: React.FC = () => {
     setCurrentView('results');
   };
   const handleMenuItemClick = (itemId: string) => {
+    // Para OCR, requerir que haya datos de consulta
+    if (itemId === 'ocr' && !queryData) {
+      // Mostrar un mensaje o redirigir a search
+      alert('Primero completa una consulta de marca para acceder al análisis OCR');
+      return;
+    }
     setCurrentView(itemId as ViewType);
     setIsSidebarOpen(false);
   };
@@ -318,7 +327,7 @@ const AEOTrackerApp: React.FC = () => {
           duration: 0.4,
           ease: "easeInOut"
         }}>
-              {renderPlaceholderView('OCR Análisis', 'Extrae y optimiza texto de imágenes usando tecnología de reconocimiento óptico de caracteres avanzada.', FileText)}
+              <AEOOCRAnalysis queryData={queryData!} onBack={() => setCurrentView('search')} />
             </motion.div> : currentView === 'seo' ? <motion.div key="seo" initial={{
           opacity: 0,
           y: 20
