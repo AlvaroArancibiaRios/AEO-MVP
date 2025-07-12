@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, Sparkles, Settings, Bell, User, Search, Eye, FileText, BarChart3, Users, Bot, X, ChevronRight } from 'lucide-react';
+import { Menu, Sparkles, Settings, Bell, User, Search, Eye, FileText, BarChart3, Users, Bot, X, ChevronRight, Clock } from 'lucide-react';
 import AEOBrandQueryForm from './AEOBrandQueryForm';
 import AEODashboardResults from './AEODashboardResultsNew';
 import AEOLLMComparisonDashboard from './AEOLLMComparisonDashboard';
@@ -10,13 +10,14 @@ import AEOOCRAnalysis from './AEOOCRAnalysis';
 import AEOSEOAnalysis from './AEOSEOAnalysis';
 import AEOCompetitorAnalysis from './AEOCompetitorAnalysis';
 import AEODocumentsAI from './AEODocumentsAI';
+import AEOTemporalAnalysis from './AEOTemporalAnalysis';
 interface QueryData {
   brand: string;
   query: string;
   website: string;
   screenshot?: string;
 }
-type ViewType = 'search' | 'results' | 'comparison' | 'ocr' | 'seo' | 'competitors' | 'documents';
+type ViewType = 'search' | 'results' | 'comparison' | 'ocr' | 'seo' | 'competitors' | 'documents' | 'temporal';
 const AEOTrackerApp: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>('search');
   const [queryData, setQueryData] = useState<QueryData | null>(null);
@@ -57,6 +58,12 @@ const AEOTrackerApp: React.FC = () => {
     description: 'Genera robots.txt y llm.txt automáticamente',
     icon: Bot,
     isNew: false
+  }, {
+    id: 'temporal',
+    title: 'Análisis Temporal',
+    description: 'Monitoreo de posiciones y variabilidad en el tiempo',
+    icon: Clock,
+    isNew: true
   }] as any[];
   const handleSearch = (brand: string, query: string, website: string, screenshot?: string) => {
     setQueryData({
@@ -78,8 +85,8 @@ const AEOTrackerApp: React.FC = () => {
     setCurrentView('results');
   };
   const handleMenuItemClick = (itemId: string) => {
-    // Para OCR, SEO, Competitors y Documents, requerir que haya datos de consulta
-    if ((itemId === 'ocr' || itemId === 'seo' || itemId === 'competitors' || itemId === 'documents') && !queryData) {
+    // Para OCR, SEO, Competitors, Documents y Temporal, requerir que haya datos de consulta
+    if ((itemId === 'ocr' || itemId === 'seo' || itemId === 'competitors' || itemId === 'documents' || itemId === 'temporal') && !queryData) {
       // Mostrar un mensaje o redirigir a search
       alert(`Primero completa una consulta de marca para acceder al análisis ${itemId.toUpperCase()}`);
       return;
@@ -373,6 +380,20 @@ const AEOTrackerApp: React.FC = () => {
           ease: "easeInOut"
         }}>
               <AEODocumentsAI queryData={queryData!} onBack={() => setCurrentView('search')} />
+            </motion.div> : currentView === 'temporal' ? <motion.div key="temporal" initial={{
+          opacity: 0,
+          y: 20
+        }} animate={{
+          opacity: 1,
+          y: 0
+        }} exit={{
+          opacity: 0,
+          y: -20
+        }} transition={{
+          duration: 0.4,
+          ease: "easeInOut"
+        }}>
+              <AEOTemporalAnalysis queryData={queryData!} onBack={() => setCurrentView('search')} />
             </motion.div> : null}
         </AnimatePresence>
       </main>
