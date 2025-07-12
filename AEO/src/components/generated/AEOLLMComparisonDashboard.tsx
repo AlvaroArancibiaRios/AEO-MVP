@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import AEOLLMComparisonGrid from './AEOLLMComparisonGrid';
 import { ArrowLeft, Download, Filter, SortAsc, SortDesc, TrendingUp, TrendingDown, BarChart3, Activity, Target, Award, Zap, Eye, Calendar } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 interface QueryData {
@@ -274,6 +275,25 @@ const AEOLLMComparisonDashboard: React.FC<AEOLLMComparisonDashboardProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Enhanced LLM Comparison Grid */}
+      <AEOLLMComparisonGrid
+        llmResults={llmModels.map(model => ({
+          name: model.name,
+          mentions: model.mentions,
+          accuracy: model.accuracy,
+          relevance: model.relevance || 85,
+          sentiment: (model.sentiment || 'positive') as 'positive' | 'neutral' | 'negative',
+          position: model.ranking,
+          context_quality: model.contextQuality || 'Excelente contexto con información detallada',
+          citation_frequency: model.citationFreq || 80,
+          trending: model.trend,
+          color: model.color,
+          icon: model.icon
+        }))}
+        onSelectLLM={(llm) => console.log('Selected LLM:', llm)}
+        selectedLLM={null}
+      />
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -309,7 +309,12 @@ const AEOTrackerApp: React.FC = () => {
           duration: 0.4,
           ease: "easeInOut"
         }}>
-              <AEODashboardResults queryData={queryData!} onNewSearch={handleNewSearch} />
+              <AEODashboardResults 
+                queryData={queryData!} 
+                onNewSearch={handleNewSearch} 
+                onViewComparison={handleViewComparison}
+                onViewTemporal={() => setCurrentView('temporal')}
+              />
             </motion.div> : currentView === 'comparison' ? <motion.div key="comparison" initial={{
           opacity: 0,
           y: 20

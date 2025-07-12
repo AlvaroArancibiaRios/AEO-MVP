@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import AEOMetricsGrid from './AEOMetricsGrid';
 import { 
   Search, 
   RotateCcw, 
@@ -51,6 +52,8 @@ interface QueryData {
 interface AEODashboardResultsProps {
   queryData: QueryData;
   onNewSearch: () => void;
+  onViewComparison?: () => void;
+  onViewTemporal?: () => void;
 }
 
 interface LLMResult {
@@ -89,7 +92,9 @@ interface AnalysisInsights {
 
 const AEODashboardResults: React.FC<AEODashboardResultsProps> = ({
   queryData,
-  onNewSearch
+  onNewSearch,
+  onViewComparison,
+  onViewTemporal
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeView, setActiveView] = useState<'overview' | 'detailed' | 'insights'>('overview');
@@ -299,65 +304,19 @@ const AEODashboardResults: React.FC<AEODashboardResultsProps> = ({
           </div>
         </div>
 
-        {/* Key Metrics Overview */}
+        {/* Enhanced Metrics Grid */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"
+          className="mb-8"
         >
-          {[
-            {
-              title: 'Score AEO Global',
-              value: analysisInsights.overall_score,
-              suffix: '/100',
-              icon: Crown,
-              color: 'text-primary',
-              bgColor: 'bg-primary/10'
-            },
-            {
-              title: 'Total Menciones',
-              value: llmResults.reduce((sum, llm) => sum + llm.mentions, 0),
-              suffix: '',
-              icon: Activity,
-              color: 'text-green-500',
-              bgColor: 'bg-green-500/10'
-            },
-            {
-              title: 'Promedio Precisión',
-              value: Math.round(llmResults.reduce((sum, llm) => sum + llm.accuracy, 0) / llmResults.length),
-              suffix: '%',
-              icon: Target,
-              color: 'text-blue-500',
-              bgColor: 'bg-blue-500/10'
-            },
-            {
-              title: 'Tendencia',
-              value: 'Creciendo',
-              suffix: '+15%',
-              icon: TrendingUp,
-              color: 'text-green-500',
-              bgColor: 'bg-green-500/10'
-            }
-          ].map((metric, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-card rounded-xl p-6 border"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className={`w-10 h-10 ${metric.bgColor} rounded-lg flex items-center justify-center`}>
-                  <metric.icon className={`w-5 h-5 ${metric.color}`} />
-                </div>
-                {metric.title === 'Tendencia' && getTrendIcon('up')}
-              </div>
-              <div className="text-2xl font-bold text-foreground">
-                {typeof metric.value === 'string' ? metric.value : metric.value}{metric.suffix}
-              </div>
-              <div className="text-sm text-muted-foreground">{metric.title}</div>
-            </motion.div>
-          ))}
+          <AEOMetricsGrid
+            llmResults={llmResults}
+            analysisInsights={analysisInsights}
+            onViewComparison={onViewComparison}
+            onViewTemporal={onViewTemporal}
+            onViewDetailedAnalysis={() => setActiveView('detailed')}
+          />
         </motion.div>
 
         {/* Navigation Tabs */}
