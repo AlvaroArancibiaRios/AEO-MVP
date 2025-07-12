@@ -4,9 +4,12 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, Sparkles, Settings, Bell, User, Search, Eye, FileText, BarChart3, Users, Bot, X, ChevronRight } from 'lucide-react';
 import AEOBrandQueryForm from './AEOBrandQueryForm';
-import AEODashboardResults from './AEODashboardResults';
+import AEODashboardResults from './AEODashboardResultsNew';
 import AEOLLMComparisonDashboard from './AEOLLMComparisonDashboard';
 import AEOOCRAnalysis from './AEOOCRAnalysis';
+import AEOSEOAnalysis from './AEOSEOAnalysis';
+import AEOCompetitorAnalysis from './AEOCompetitorAnalysis';
+import AEODocumentsAI from './AEODocumentsAI';
 interface QueryData {
   brand: string;
   query: string;
@@ -75,10 +78,10 @@ const AEOTrackerApp: React.FC = () => {
     setCurrentView('results');
   };
   const handleMenuItemClick = (itemId: string) => {
-    // Para OCR, requerir que haya datos de consulta
-    if (itemId === 'ocr' && !queryData) {
+    // Para OCR, SEO, Competitors y Documents, requerir que haya datos de consulta
+    if ((itemId === 'ocr' || itemId === 'seo' || itemId === 'competitors' || itemId === 'documents') && !queryData) {
       // Mostrar un mensaje o redirigir a search
-      alert('Primero completa una consulta de marca para acceder al análisis OCR');
+      alert(`Primero completa una consulta de marca para acceder al análisis ${itemId.toUpperCase()}`);
       return;
     }
     setCurrentView(itemId as ViewType);
@@ -341,7 +344,7 @@ const AEOTrackerApp: React.FC = () => {
           duration: 0.4,
           ease: "easeInOut"
         }}>
-              {renderPlaceholderView('SEO Análisis', 'Optimiza tu contenido para motores de búsqueda con análisis detallado y recomendaciones personalizadas.', BarChart3)}
+              <AEOSEOAnalysis queryData={queryData!} onBack={() => setCurrentView('search')} />
             </motion.div> : currentView === 'competitors' ? <motion.div key="competitors" initial={{
           opacity: 0,
           y: 20
@@ -355,7 +358,7 @@ const AEOTrackerApp: React.FC = () => {
           duration: 0.4,
           ease: "easeInOut"
         }}>
-              {renderPlaceholderView('Análisis de Competidores', 'Compara tu marca con la competencia y descubre oportunidades de mejora en el mercado.', Users)}
+              <AEOCompetitorAnalysis queryData={queryData!} onBack={() => setCurrentView('search')} />
             </motion.div> : currentView === 'documents' ? <motion.div key="documents" initial={{
           opacity: 0,
           y: 20
@@ -369,7 +372,7 @@ const AEOTrackerApp: React.FC = () => {
           duration: 0.4,
           ease: "easeInOut"
         }}>
-              {renderPlaceholderView('Documentos IA', 'Genera automáticamente robots.txt y llm.txt optimizados para mejorar la indexación de tu sitio.', Bot)}
+              <AEODocumentsAI queryData={queryData!} onBack={() => setCurrentView('search')} />
             </motion.div> : null}
         </AnimatePresence>
       </main>
